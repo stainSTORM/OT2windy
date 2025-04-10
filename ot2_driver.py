@@ -136,6 +136,7 @@ class OT2_Driver:
             return proto_out, resource_out
         else:
             return config_path, None
+        
 
     def transfer(self, protocol_path: str) -> Tuple[str, str]:
         url = f"{self.base_url}/protocols"

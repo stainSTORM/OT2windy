@@ -1,17 +1,19 @@
 # Use an official Python runtime as a base image
-# sudo docker build -t arkitekt_opentrons .
+# Build: sudo docker build -t arkitekt_opentrons .
+# Clean Cache https://stackoverflow.com/questions/62473932/at-least-one-invalid-signature-was-encountered
+# Run: sudo docker run -it --rm --name arkitekt_opentrons arkitekt_opentrons
 FROM python:3.10-slim
 
-# Set environment variables to prevent Python from generating .pyc files
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
+# Install debian-archive-keyring first, then update and install build-essential
+RUN apt-get update && \
+    apt-get install -y debian-archive-keyring && \
+    apt-get update && \
+    apt-get install -y build-essential && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 # Set the working directory
 WORKDIR /app
 
