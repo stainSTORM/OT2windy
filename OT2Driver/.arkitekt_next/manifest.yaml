@@ -1,0 +1,6 @@
+author: franziskaniemeyer
+entrypoint: ot2_driver
+identifier: OT2Driver
+scopes:
+- read
+version: 0.0.1

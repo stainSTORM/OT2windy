@@ -1,0 +1,853 @@
+"""Make string uppercase"""
+directive @upper on FIELD
+
+directive @replace(old: String!, new: String!) on FIELD
+
+"""Make get stuff uppercase"""
+directive @relation(on: String!) on FIELD
+
+type RekuestFilterNode implements GraphNode & RetriableNode & AssignableNode & RekuestNode {
+  kind: GraphNodeKind!
+  id: ID!
+  position: Position!
+  parentNode: String
+  ins: [[Port!]!]!
+  outs: [[Port!]!]!
+  constants: [Port!]!
+  voids: [Port!]!
+  constantsMap: ValueMap!
+  globalsMap: ValueMap!
+  description: String!
+  title: String!
+  retries: Int
+  retryDelay: Int
+  nextTimeout: Int
+  hash: String!
+  mapStrategy: String!
+  allowLocalExecution: Boolean!
+  binds: Binds!
+  nodeKind: NodeKind!
+  path: String
+}
+
+interface GraphNode {
+  kind: GraphNodeKind!
+  id: ID!
+  position: Position!
+  parentNode: String
+  ins: [[Port!]!]!
+  outs: [[Port!]!]!
+  constants: [Port!]!
+  voids: [Port!]!
+  constantsMap: ValueMap!
+  globalsMap: ValueMap!
+  description: String!
+  title: String!
+}
+
+enum GraphNodeKind {
+  REACTIVE
+  ARGS
+  RETURNS
+  REKUEST
+  REKUEST_FILTER
+}
+
+type Position {
+  x: Float!
+  y: Float!
+}
+
+type Port {
+  key: String!
+  scope: PortScope!
+  label: String
+  kind: PortKind!
+  description: String
+  identifier: Identifier
+  nullable: Boolean!
+  effects: [Effect!]
+  default: AnyDefault
+  children: [ChildPort!]
+  assignWidget: AssignWidget
+  returnWidget: ReturnWidget
+  validators: [Validator!]
+}
+
+enum PortScope {
+  GLOBAL
+  LOCAL
+}
+
+enum PortKind {
+  INT
+  STRING
+  STRUCTURE
+  LIST
+  BOOL
+  DICT
+  FLOAT
+  DATE
+  UNION
+  MODEL
+}
+
+"""
+The `ArrayLike` scalar type represents a reference to a store previously created by the user n a datalayer
+"""
+scalar Identifier
+
+interface Effect {
+  dependencies: [String!]!
+  kind: EffectKind!
+  function: ValidatorFunction!
+}
+
+enum EffectKind {
+  MESSAGE
+  HIDE
+  CUSTOM
+}
+
+"\n    The `Validator` scalar represents a javascript function that should execute on the client side (inside a shadow realm)\n      to validate a value (or a set of values) before it is sent to the server.  The function has two parameters (value, otherValues) and should return a string if the value is invalid and undefined if the value is valid.\n        The otherValues parameter is an object with the other values in the form {fieldName: value}."
+scalar ValidatorFunction
+
+"""
+The `ArrayLike` scalar type represents a reference to a store previously created by the user n a datalayer
+"""
+scalar AnyDefault
+
+type ChildPort {
+  key: String!
+  label: String
+  scope: PortScope!
+  kind: PortKind!
+  description: String
+  identifier: Identifier
+  nullable: Boolean!
+  default: AnyDefault
+  children: [ChildPort!]
+  assignWidget: AssignWidget
+  returnWidget: ReturnWidget
+}
+
+interface AssignWidget {
+  kind: AssignWidgetKind!
+  followValue: String
+}
+
+enum AssignWidgetKind {
+  SEARCH
+  CHOICE
+  SLIDER
+  CUSTOM
+  STRING
+  STATE_CHOICE
+}
+
+interface ReturnWidget {
+  kind: ReturnWidgetKind!
+}
+
+enum ReturnWidgetKind {
+  CHOICE
+  CUSTOM
+}
+
+type Validator {
+  function: ValidatorFunction!
+  dependencies: [String!]
+  label: String
+  errorMessage: String
+}
+
+"""
+The `ArrayLike` scalasr typsse represents a reference to a store previously created by the user n a datalayer
+"""
+scalar ValueMap
+
+interface AssignableNode {
+  nextTimeout: Int
+}
+
+interface RekuestNode {
+  hash: String!
+  mapStrategy: String!
+  allowLocalExecution: Boolean!
+  binds: Binds!
+  nodeKind: NodeKind!
+}
+
+type Binds {
+  templates: [ID!]!
+  clients: [ID!]!
+  desiredInstances: Int!
+}
+
+enum NodeKind {
+  FUNCTION
+  GENERATOR
+}
+
+type RekuestMapNode implements GraphNode & RetriableNode & AssignableNode & RekuestNode {
+  kind: GraphNodeKind!
+  id: ID!
+  position: Position!
+  parentNode: String
+  ins: [[Port!]!]!
+  outs: [[Port!]!]!
+  constants: [Port!]!
+  voids: [Port!]!
+  constantsMap: ValueMap!
+  globalsMap: ValueMap!
+  description: String!
+  title: String!
+  retries: Int
+  retryDelay: Int
+  nextTimeout: Int
+  hash: String!
+  mapStrategy: String!
+  allowLocalExecution: Boolean!
+  binds: Binds!
+  nodeKind: NodeKind!
+  hello: String
+}
+
+interface RetriableNode {
+  retries: Int
+  retryDelay: Int
+}
+
+type ArgNode implements GraphNode {
+  kind: GraphNodeKind!
+  id: ID!
+  position: Position!
+  parentNode: String
+  ins: [[Port!]!]!
+  outs: [[Port!]!]!
+  constants: [Port!]!
+  voids: [Port!]!
+  constantsMap: ValueMap!
+  globalsMap: ValueMap!
+  description: String!
+  title: String!
+  argStuff: String
+}
+
+type ReturnNode implements GraphNode {
+  kind: GraphNodeKind!
+  id: ID!
+  position: Position!
+  parentNode: String
+  ins: [[Port!]!]!
+  outs: [[Port!]!]!
+  constants: [Port!]!
+  voids: [Port!]!
+  constantsMap: ValueMap!
+  globalsMap: ValueMap!
+  description: String!
+  title: String!
+  returnStuff: String
+}
+
+type VanillaEdge implements GraphEdge {
+  kind: GraphEdgeKind!
+  id: ID!
+  source: String!
+  target: String!
+  sourceHandle: String!
+  targetHandle: String!
+  stream: [StreamItem!]!
+  label: String
+}
+
+interface GraphEdge {
+  kind: GraphEdgeKind!
+  id: ID!
+  source: String!
+  target: String!
+  sourceHandle: String!
+  targetHandle: String!
+  stream: [StreamItem!]!
+}
+
+enum GraphEdgeKind {
+  VANILLA
+  LOGGING
+}
+
+type StreamItem {
+  kind: PortKind!
+  label: String!
+}
+
+type LoggingEdge implements GraphEdge {
+  kind: GraphEdgeKind!
+  id: ID!
+  source: String!
+  target: String!
+  sourceHandle: String!
+  targetHandle: String!
+  stream: [StreamItem!]!
+  level: String!
+}
+
+type ReactiveNode implements GraphNode {
+  kind: GraphNodeKind!
+  id: ID!
+  position: Position!
+  parentNode: String
+  ins: [[Port!]!]!
+  outs: [[Port!]!]!
+  constants: [Port!]!
+  voids: [Port!]!
+  constantsMap: ValueMap!
+  globalsMap: ValueMap!
+  description: String!
+  title: String!
+  argStuff: String
+  implementation: ReactiveImplementation!
+}
+
+enum ReactiveImplementation {
+  ZIP
+  COMBINELATEST
+  WITHLATEST
+  BUFFER_COMPLETE
+  BUFFER_UNTIL
+  DELAY
+  DELAY_UNTIL
+  CHUNK
+  SPLIT
+  OMIT
+  ENSURE
+  SELECT
+  ADD
+  SUBTRACT
+  MULTIPLY
+  DIVIDE
+  MODULO
+  POWER
+  JUST
+  PREFIX
+  SUFFIX
+  FILTER
+  GATE
+  TO_LIST
+  FOREACH
+  IF
+  AND
+  ALL
+}
+
+type SliderAssignWidget implements AssignWidget {
+  kind: AssignWidgetKind!
+  followValue: String
+  min: Float
+  max: Float
+  step: Float
+}
+
+type ChoiceAssignWidget implements AssignWidget {
+  kind: AssignWidgetKind!
+  followValue: String
+  choices: [Choice!]
+}
+
+type Choice {
+  label: String!
+  value: String!
+  image: String
+  description: String
+}
+
+type SearchAssignWidget implements AssignWidget {
+  kind: AssignWidgetKind!
+  followValue: String
+  query: String!
+  ward: String!
+  filters: [ChildPort!]
+  dependencies: [String!]
+}
+
+type StateChoiceAssignWidget implements AssignWidget {
+  kind: AssignWidgetKind!
+  followValue: String
+  stateChoices: String!
+}
+
+type CustomReturnWidget implements ReturnWidget {
+  kind: ReturnWidgetKind!
+  hook: String!
+  ward: String!
+}
+
+type ChoiceReturnWidget implements ReturnWidget {
+  kind: ReturnWidgetKind!
+  choices: [Choice!]
+}
+
+type StringAssignWidget implements AssignWidget {
+  kind: AssignWidgetKind!
+  followValue: String
+  placeholder: String!
+  asParagraph: Boolean!
+}
+
+type CustomAssignWidget implements AssignWidget {
+  kind: AssignWidgetKind!
+  followValue: String
+  hook: String!
+  ward: String!
+}
+
+type CustomEffect implements Effect {
+  dependencies: [String!]!
+  kind: EffectKind!
+  function: ValidatorFunction!
+  hook: String!
+  ward: String!
+}
+
+type MessageEffect implements Effect {
+  dependencies: [String!]!
+  kind: EffectKind!
+  function: ValidatorFunction!
+  message: String!
+}
+
+type Query {
+  flows(filters: FlowFilter, pagination: OffsetPaginationInput): [Flow!]!
+  runs(filters: RunFilter, order: RunOrder, pagination: OffsetPaginationInput): [Run!]!
+  snapshots(pagination: OffsetPaginationInput): [Snapshot!]!
+  workspaces(filters: WorkspaceFilter, order: WorkspaceOrder, pagination: OffsetPaginationInput): [Workspace!]!
+  reactiveTemplates(filters: ReactiveTemplateFilter, pagination: OffsetPaginationInput): [ReactiveTemplate!]!
+  workspace(id: ID!): Workspace!
+  reactiveTemplate(id: ID!): ReactiveTemplate!
+  eventsBetween(run: ID!, min: Int = null, max: Int = null): [RunEvent!]!
+  run(id: ID!): Run!
+  runForAssignation(id: ID!): Run!
+  flow(id: ID!): Flow!
+  snapshot(id: ID!): Snapshot!
+}
+
+"""
+Flow(id, created_at, workspace, creator, restrict, version, title, nodes, edges, graph, hash, description, brittle)
+"""
+type Flow {
+  id: ID!
+  title: String!
+  description: String
+  createdAt: DateTime!
+  workspace: Workspace!
+  hash: String!
+  graph: Graph!
+}
+
+"""Date with time (isoformat)"""
+scalar DateTime
+
+"""Graph is a Template for a Template"""
+type Workspace {
+  id: ID!
+  title: String!
+  description: String
+  createdAt: DateTime!
+  flows(filters: FlowFilter, pagination: OffsetPaginationInput): [Flow!]!
+  latestFlow: Flow
+}
+
+"""
+Flow(id, created_at, workspace, creator, restrict, version, title, nodes, edges, graph, hash, description, brittle)
+"""
+input FlowFilter {
+  workspace: WorkspaceFilter
+  ids: [ID!]
+  search: String
+  AND: FlowFilter
+  OR: FlowFilter
+  NOT: FlowFilter
+}
+
+"""Graph is a Template for a Template"""
+input WorkspaceFilter {
+  name: StrFilterLookup
+  ids: [ID!]
+  search: String
+  AND: WorkspaceFilter
+  OR: WorkspaceFilter
+  NOT: WorkspaceFilter
+}
+
+input StrFilterLookup {
+  exact: String
+  iExact: String
+  contains: String
+  iContains: String
+  inList: [String!]
+  gt: String
+  gte: String
+  lt: String
+  lte: String
+  startsWith: String
+  iStartsWith: String
+  endsWith: String
+  iEndsWith: String
+  range: [String!]
+  isNull: Boolean
+  regex: String
+  iRegex: String
+}
+
+input OffsetPaginationInput {
+  offset: Int! = 0
+  limit: Int! = -1
+}
+
+type Graph {
+  zoom: Float!
+  nodes: [GraphNode!]!
+  edges: [GraphEdge!]!
+  globals: [GlobalArg!]!
+}
+
+type GlobalArg {
+  key: String!
+  port: Port!
+}
+
+"""Run(id, created_at, flow, assignation, status, snapshot_interval)"""
+type Run {
+  id: ID!
+  createdAt: DateTime!
+  events(pagination: OffsetPaginationInput): [RunEvent!]!
+  flow: Flow!
+  assignation: ID!
+  snapshots(pagination: OffsetPaginationInput): [Snapshot!]!
+  status: RunStatus!
+  latestSnapshot: Snapshot
+}
+
+"""
+RunEvent(id, created_at, reference, run, kind, t, caused_by, source, handle, value, exception)
+"""
+type RunEvent {
+  id: ID!
+  t: Int!
+  causedBy: [ID!]!
+  value: EventValue
+  exception: String
+
+  """The type of event"""
+  kind: RunEventKind!
+  handle: String!
+  source: String!
+  createdAt: DateTime!
+}
+
+"""
+The `ArrayLike` scalasr typsse represents a reference to a store previously created by the user n a datalayer
+"""
+scalar EventValue
+
+enum RunEventKind {
+  NEXT
+  ERROR
+  COMPLETE
+  UNKNOWN
+}
+
+"""Snapshot(id, created_at, run, t, status)"""
+type Snapshot {
+  t: Int!
+  run: Run!
+  events(pagination: OffsetPaginationInput): [RunEvent!]!
+  id: ID!
+  status: String
+  createdAt: DateTime!
+}
+
+enum RunStatus {
+  RUNNING
+  COMPLETED
+}
+
+"""Run(id, created_at, flow, assignation, status, snapshot_interval)"""
+input RunFilter {
+  ids: [ID!]
+  search: String
+  AND: RunFilter
+  OR: RunFilter
+  NOT: RunFilter
+}
+
+"""Run(id, created_at, flow, assignation, status, snapshot_interval)"""
+input RunOrder {
+  createdAt: DateTime
+  AND: RunOrder
+  OR: RunOrder
+  NOT: RunOrder
+}
+
+input WorkspaceOrder {
+  createdAt: Ordering
+}
+
+enum Ordering {
+  ASC
+  DESC
+}
+
+"""
+ReactiveTemplate(id, title, description, implementation, ins, outs, voids, constants)
+"""
+type ReactiveTemplate {
+  id: ID!
+
+  """Check async Programming Textbook"""
+  implementation: ReactiveImplementation!
+  title: String!
+  description: String
+  ins: [[Port!]!]!
+  outs: [[Port!]!]!
+  constants: [Port!]!
+  voids: [Port!]!
+}
+
+"""
+ReactiveTemplate(id, title, description, implementation, ins, outs, voids, constants)
+"""
+input ReactiveTemplateFilter {
+  ids: [ID!]
+  implementations: [ReactiveImplementation!]
+  search: String
+  AND: ReactiveTemplateFilter
+  OR: ReactiveTemplateFilter
+  NOT: ReactiveTemplateFilter
+}
+
+type Mutation {
+  updateWorkspace(input: UpdateWorkspaceInput!): Workspace!
+  createWorkspace(input: CreateWorkspaceInput!): Workspace!
+  createRun(input: CreateRunInput!): Run!
+  closeRun(input: CloseRunInput!): Run!
+  deleteRun(input: DeleteRunInput!): ID!
+  snapshot(input: SnapshotRunInput!): Snapshot!
+  deleteSnapshot(input: DeleteSnapshotInput!): ID!
+  track(input: TrackInput!): RunEvent!
+}
+
+input UpdateWorkspaceInput {
+  workspace: ID!
+  graph: GraphInput!
+  title: String = null
+  description: String = null
+}
+
+input GraphInput {
+  nodes: [GraphNodeInput!]!
+  edges: [GraphEdgeInput!]!
+  globals: [GlobalArgInput!]!
+}
+
+input GraphNodeInput {
+  hello: String = null
+  path: String = null
+  id: String!
+  kind: GraphNodeKind!
+  position: PositionInput!
+  parentNode: String = null
+  ins: [[PortInput!]!]!
+  outs: [[PortInput!]!]!
+  constants: [PortInput!]!
+  voids: [PortInput!]!
+  constantsMap: ValueMap!
+  globalsMap: ValueMap!
+  description: String = null
+  title: String = null
+  retries: Int = null
+  retryDelay: Int = null
+  nodeKind: NodeKind = null
+  nextTimeout: Int = null
+  hash: String = null
+  mapStrategy: MapStrategy = null
+  allowLocalExecution: Boolean = null
+  binds: BindsInput = null
+  implementation: ReactiveImplementation = null
+}
+
+input PositionInput {
+  x: Float!
+  y: Float!
+}
+
+input PortInput {
+  validators: [ValidatorInput!] = null
+  key: String!
+  scope: PortScope!
+  label: String = null
+  kind: PortKind!
+  description: String = null
+  identifier: String = null
+  nullable: Boolean! = false
+  effects: [EffectInput!] = null
+  default: AnyDefault = null
+  children: [ChildPortInput!] = null
+  assignWidget: AssignWidgetInput = null
+  returnWidget: ReturnWidgetInput = null
+}
+
+input ValidatorInput {
+  function: ValidatorFunction!
+  dependencies: [String!] = []
+  label: String = null
+  errorMessage: String = null
+}
+
+input EffectInput {
+  function: ValidatorFunction!
+  dependencies: [String!]! = []
+  message: String = null
+  kind: EffectKind!
+  hook: String = null
+  ward: String = null
+}
+
+input ChildPortInput {
+  default: AnyDefault = null
+  key: String!
+  label: String = null
+  kind: PortKind!
+  scope: PortScope!
+  description: String = null
+  identifier: Identifier = null
+  nullable: Boolean!
+  children: [ChildPortInput!] = null
+  effects: [EffectInput!] = null
+  assignWidget: AssignWidgetInput = null
+  returnWidget: ReturnWidgetInput = null
+}
+
+input AssignWidgetInput {
+  asParagraph: Boolean = null
+  kind: AssignWidgetKind!
+  query: SearchQuery = null
+  choices: [ChoiceInput!] = null
+  stateChoices: String = null
+  followValue: String = null
+  min: Float = null
+  max: Float = null
+  step: Float = null
+  placeholder: String = null
+  hook: String = null
+  ward: String = null
+  fallback: AssignWidgetInput = null
+  filters: [ChildPortInput!] = null
+  dependencies: [String!] = null
+}
+
+"""
+The `ArrayLike` scalar type represents a reference to a store previously created by the user n a datalayer
+"""
+scalar SearchQuery
+
+input ChoiceInput {
+  value: AnyDefault!
+  label: String!
+  image: String = null
+  description: String = null
+}
+
+input ReturnWidgetInput {
+  kind: ReturnWidgetKind!
+  query: SearchQuery = null
+  choices: [ChoiceInput!] = null
+  min: Int = null
+  max: Int = null
+  step: Int = null
+  placeholder: String = null
+  hook: String = null
+  ward: String = null
+}
+
+enum MapStrategy {
+  MAP
+  MAP_TO
+  MAP_FROM
+}
+
+input BindsInput {
+  templates: [String!] = null
+  clients: [String!] = null
+  desiredInstances: Int! = 1
+}
+
+input GraphEdgeInput {
+  label: String = null
+  level: String = null
+  kind: GraphEdgeKind!
+  id: String!
+  source: String!
+  target: String!
+  sourceHandle: String!
+  targetHandle: String!
+  stream: [StreamItemInput!]!
+}
+
+input StreamItemInput {
+  kind: PortKind!
+  label: String!
+}
+
+input GlobalArgInput {
+  key: String!
+  port: PortInput!
+}
+
+input CreateWorkspaceInput {
+  graph: GraphInput = null
+  title: String = null
+  description: String = null
+  vanilla: Boolean! = false
+}
+
+input CreateRunInput {
+  flow: ID!
+  snapshotInterval: Int!
+  assignation: ID!
+}
+
+input CloseRunInput {
+  run: ID!
+}
+
+input DeleteRunInput {
+  run: ID!
+}
+
+input SnapshotRunInput {
+  run: ID!
+  events: [ID!]!
+  t: Int!
+}
+
+input DeleteSnapshotInput {
+  snapshot: ID!
+}
+
+input TrackInput {
+  reference: String!
+  t: Int!
+  kind: RunEventKind!
+  value: EventValue = null
+  run: ID!
+  causedBy: [ID!]! = []
+  message: String = null
+  exception: String = null
+  source: String = null
+  handle: String = null
+}
+
+type Subscription {
+  events(run: ID!): RunEvent!
+}

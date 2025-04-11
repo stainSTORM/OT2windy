@@ -17,6 +17,161 @@ parameters = {
 num_slides = parameters['n_slides_box1'] + parameters['n_slides_box2']
 number_antibodies = 3
 
+
+# ====== labware ========
+
+staining_jar = {
+    "ordering": [
+        [
+            "A1",
+            "B1"
+        ],
+        [
+            "A2",
+            "B2"
+        ],
+        [
+            "A3",
+            "B3"
+        ],
+        [
+            "A4",
+            "B4"
+        ]
+    ],
+    "brand": {
+        "brand": "Custom",
+        "brandId": [
+            "Custom"
+        ]
+    },
+    "metadata": {
+        "displayName": "StainChamberTest",
+        "displayCategory": "wellPlate",
+        "displayVolumeUnits": "µL",
+        "tags": []
+    },
+    "dimensions": {
+        "xDimension": 127.76,
+        "yDimension": 85.47,
+        "zDimension": 110
+    },
+    "wells": {
+        "A1": {
+            "depth": 10,
+            "totalLiquidVolume": 10000,
+            "shape": "rectangular",
+            "xDimension": 10,
+            "yDimension": 20,
+            "x": 15,
+            "y": 64.47,
+            "z": 100
+        },
+        "B1": {
+            "depth": 10,
+            "totalLiquidVolume": 10000,
+            "shape": "rectangular",
+            "xDimension": 10,
+            "yDimension": 20,
+            "x": 15,
+            "y": 19.47,
+            "z": 100
+        },
+        "A2": {
+            "depth": 10,
+            "totalLiquidVolume": 10000,
+            "shape": "rectangular",
+            "xDimension": 10,
+            "yDimension": 20,
+            "x": 40,
+            "y": 64.47,
+            "z": 100
+        },
+        "B2": {
+            "depth": 10,
+            "totalLiquidVolume": 10000,
+            "shape": "rectangular",
+            "xDimension": 10,
+            "yDimension": 20,
+            "x": 40,
+            "y": 19.47,
+            "z": 100
+        },
+        "A3": {
+            "depth": 10,
+            "totalLiquidVolume": 10000,
+            "shape": "rectangular",
+            "xDimension": 10,
+            "yDimension": 20,
+            "x": 65,
+            "y": 64.47,
+            "z": 100
+        },
+        "B3": {
+            "depth": 10,
+            "totalLiquidVolume": 10000,
+            "shape": "rectangular",
+            "xDimension": 10,
+            "yDimension": 20,
+            "x": 65,
+            "y": 19.47,
+            "z": 100
+        },
+        "A4": {
+            "depth": 10,
+            "totalLiquidVolume": 10000,
+            "shape": "rectangular",
+            "xDimension": 10,
+            "yDimension": 20,
+            "x": 90,
+            "y": 64.47,
+            "z": 100
+        },
+        "B4": {
+            "depth": 10,
+            "totalLiquidVolume": 10000,
+            "shape": "rectangular",
+            "xDimension": 10,
+            "yDimension": 20,
+            "x": 90,
+            "y": 19.47,
+            "z": 100
+        }
+    },
+    "groups": [
+        {
+            "metadata": {
+                "wellBottomShape": "flat"
+            },
+            "wells": [
+                "A1",
+                "B1",
+                "A2",
+                "B2",
+                "A3",
+                "B3",
+                "A4",
+                "B4"
+            ]
+        }
+    ],
+    "parameters": {
+        "format": "irregular",
+        "quirks": [],
+        "isTiprack": False,
+        "isMagneticModuleCompatible": False,
+        "loadName": "stainchambertest_8well"
+    },
+    "namespace": "custom_beta",
+    "version": 1,
+    "schemaVersion": 2,
+    "cornerOffsetFromSlot": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+    }
+}
+
 # ======= liquids =======
 
 # Define initional volumes for each liquid
@@ -97,13 +252,13 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # load labware
     tips = protocol.load_labware('opentrons_96_tiprack_1000ul', 8)
-    slide_rack1 = protocol.load_labware('stainchambertest_8well', 1, '8 well stain chamber')
-    slide_rack2 = protocol.load_labware('stainchambertest_8well', 4, '8 well stain chamber')
+    slide_rack1 = protocol.load_labware_from_definition(staining_jar, 1, '8 well stain chamber')
+    slide_rack2 = protocol.load_labware_from_definition(staining_jar, 4, '8 well stain chamber')
     eppie = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 2)
     falcon = protocol.load_labware('opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical', 3)
 
     # load instruments
-    pipette = protocol.load_instrument('p1000_single_gen2', 'right', tip_racks=[tips])
+    pipette = protocol.load_instrument('p300_single_gen2', 'right', tip_racks=[tips])
 
     # define liquids used
     h2o2_liquid = protocol.define_liquid(name='H2O2',

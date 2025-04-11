@@ -3,6 +3,7 @@ from arkitekt_next import register, easy
 
 # OT2 Driver imports
 import time
+import asyncio
 import requests
 from enum import Enum
 from pathlib import Path
@@ -19,7 +20,7 @@ class PathLike:
     pass
 
 
-BASE_DIR = Path(__file__).parent.resolve()
+task: Optional[asyncio.Task] = None
 
 class OT2_Config:
     def __init__(
@@ -45,6 +46,8 @@ class RobotStatus(Enum):
     OFFLINE = "offline"
 
 class RunStatus(Enum):
+    __repr__ = lambda self: self.value
+
     IDLE = "idle"
     RUNNING = "running"
     FINISHING = "finishing"
@@ -289,6 +292,26 @@ driver = OT2_Driver(
     )
 )
 
+async def watch_run_completion(run_id: str) -> Dict:
+    """
+    Watches a run until it completes or fails.
+    """
+    while True:
+        status = driver.check_run_status(run_id)
+        if status in [RunStatus.SUCCEEDED, RunStatus.FAILED, RunStatus.STOPPED]:
+            break
+        await asyncio.sleep(1)
+    return driver.get_run_log(run_id)
+
+async def await_staining_result() -> Optional[Dict]:
+    """
+    Waits for the staining protocol to complete and returns run log.
+    """
+    global task
+    if task is None:
+        return None
+    return await task
+
 @register
 def run_washing_protocol():
     """
@@ -301,7 +324,7 @@ def run_washing_protocol():
     driver.execute(run_id)
 
 @register
-def run_staining_protocol():
+async def run_staining_protocol():
     """
     Run the staining protocol on the OT2
     """
@@ -310,6 +333,7 @@ def run_staining_protocol():
     print(f"Protocol-ID: {protocol_id}")
     print(f"Run-ID: {run_id}")
     driver.execute(run_id)
+    staining_task = asyncio.create_task(watch_run_completion(run_id))
 
 @register
 def cancel_run():
