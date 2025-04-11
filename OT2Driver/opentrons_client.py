@@ -61,7 +61,7 @@ class OpentronsClient(object):
         #self.populate_extensions()
 
     extensions = None
-        
+
     @property
     def base_url(self):
         return f"http://{self.host}:{self.port}"
@@ -166,7 +166,7 @@ class OpentronsClient(object):
         return r
     
     #%% PIPETTE
-    def add_pipette(self, name='p300_single', position='right'):
+    def add_pipette(self, name='p300_single_gen2', position='right'):
         # assign/add a pipette to the robot
         payload = {
             "name": name, 
@@ -257,29 +257,20 @@ class OpentronsClient(object):
             }
         }
     }
-    ''' 
-
-
+    '''
 
 # connect to the robot 
-mRobot = OpentronsClient(host="192.168.43.215", port=31950)
+mRobot = OpentronsClient(host="169.254.254.239", port=31950)
 
 # turn on the lights 
 mRobot.toggle_light(state=True)
 mRobot.toggle_light(state=False)
 
 # home the robot
-#mRobot.pipette_home(location="right")
-
-
-# client = OpentronsClient(host="192.168.43.215", port=31950)
-# client.toggle_light(True)
-# client.pipette_home("right")
-protocol_id, run_id = mRobot.transfer(protocol_path="/Users/bene/Downloads/ImTrons/OLD/protocol/helloWorld.py")
-protocol_id_ = mRobot.execute(run_id=run_id)
+mRobot.pipette_home("right")
 
 # upload and start a protocol
-protocol_id = mRobot.upload_protocol("./protocol/helloWorld.py")
-run_id = mRobot.start_run(protocol_id)
+protocol_id, run_id = mRobot.transfer(protocol_path="/uc2-workflow/Arkitektrons/OT2Driver/protocols/helloWorldStainstorm.py")
+protocol_id_ = mRobot.execute(run_id=run_id)
 status = mRobot.get_run_status(run_id)
-# client.stop_run(run_id)
+mRobot.stop_run(run_id)
