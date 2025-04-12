@@ -1,6 +1,6 @@
 # Arkitekt + Mikro imports
-from arkitekt_next import register, easy
-
+from arkitekt_next import register, easy, progress
+from koil.vars import check_cancelled
 # OT2 Driver imports
 import time
 import asyncio
@@ -151,6 +151,7 @@ class OT2_Driver:
             files = {"files": f}
             resp = requests.post(url=url, files=files, headers=self.headers, timeout=600)
 
+        print(resp.json())
         protocol_id = resp.json()["data"]["id"]
         run_url = f"{self.base_url}/runs"
         run_json = {"data": {"protocolId": protocol_id}}
@@ -291,8 +292,7 @@ driver = OT2_Driver(
         port=31950
     )
 )
-
-async def watch_run_completion(run_id: str) -> Dict:
+def watch_run_completion(run_id: str) -> Dict:
     """
     Watches a run until it completes or fails.
     """
@@ -300,7 +300,17 @@ async def watch_run_completion(run_id: str) -> Dict:
         status = driver.check_run_status(run_id)
         if status in [RunStatus.SUCCEEDED, RunStatus.FAILED, RunStatus.STOPPED]:
             break
-        await asyncio.sleep(1)
+        try:
+            check_cancelled()
+        except Exception:
+            driver.cancel(run_id)
+            while True:
+                status = driver.check_run_status(run_id)
+                if status in [RunStatus.FAILED, RunStatus.STOPPED]:
+                    break
+                time.sleep(1)
+
+        time.sleep(1)
     return driver.get_run_log(run_id)
 
 async def await_staining_result() -> Optional[Dict]:
@@ -319,35 +329,34 @@ def run_washing_protocol():
     """
     protocol_id, run_id = driver.transfer(protocol_path="./OT2Driver/protocols/washing.py")
     driver.current_run_id = run_id
-    print(f"Protocol-ID: {protocol_id}")
+    progress(0, f"Protocol-ID: {protocol_id}")
     print(f"Run-ID: {run_id}")
     driver.execute(run_id)
+    watch_run_completion(run_id)
 
 @register
-async def run_staining_protocol():
+def run_staining_protocol():
     """
     Run the staining protocol on the OT2
     """
     protocol_id, run_id = driver.transfer(protocol_path="./OT2Driver/protocols/staining.py")
     driver.current_run_id = run_id
-    print(f"Protocol-ID: {protocol_id}")
+    progress(0, f"Protocol-ID: {protocol_id} started")
     print(f"Run-ID: {run_id}")
     driver.execute(run_id)
-    staining_task = asyncio.create_task(watch_run_completion(run_id))
+    watch_run_completion(run_id)
 
 @register
-def cancel_run():
+def run_dummy_protocol():
     """
-    Cancel the current run
+    Run a quick dummy protocol on the OT2
     """
-    driver.cancel(run_id=driver.current_run_id)
-
-@register
-def resume_run():
-    """
-    Resume the current run
-    """
-    driver.resume(run_id=driver.current_run_id)
+    protocol_id, run_id = driver.transfer(protocol_path="./OT2Driver/protocols/dummy.py")
+    driver.current_run_id = run_id
+    progress(0, f"Protocol-ID: {protocol_id} started")
+    print(f"Run-ID: {run_id}")
+    driver.execute(run_id)
+    watch_run_completion(run_id)
 
 @register
 def get_run_status() -> RunStatus:
