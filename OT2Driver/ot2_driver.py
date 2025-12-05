@@ -10,6 +10,8 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from urllib3 import Retry
+from dotenv import load_dotenv
+import os
 
 # Example fallback definitions if not externally available
 class PathLike:
@@ -314,12 +316,6 @@ class OT2_Driver:
 # ------------------------------------------------------------------------- #
 # Helper functions
 # ------------------------------------------------------------------------- #
-driver = OT2_Driver(
-    config=OT2_Config(
-        ip="192.168.5.156",
-        port=31950,
-    )
-)
 
 
 def watch_run_completion(run_id: str) -> Dict:
@@ -352,7 +348,7 @@ async def await_staining_result() -> Optional[Dict]:
 # ------------------------------------------------------------------------- #
 @register
 def run_washing_protocol():
-    protocol_id, run_id = driver.transfer(protocol_path="./OT2Driver/protocols/washing.py")
+    protocol_id, run_id = driver.transfer(protocol_path="./protocols/washing.py")
     driver.current_run_id = run_id
     progress(0, f"Protocol-ID: {protocol_id}")
     driver.execute(run_id)
@@ -361,7 +357,7 @@ def run_washing_protocol():
 
 @register
 def run_staining_protocol():
-    protocol_id, run_id = driver.transfer(protocol_path="./OT2Driver/protocols/staining.py")
+    protocol_id, run_id = driver.transfer(protocol_path="./protocols/staining.py")
     driver.current_run_id = run_id
     progress(0, f"Protocol-ID: {protocol_id} started")
     driver.execute(run_id)
@@ -370,7 +366,7 @@ def run_staining_protocol():
 
 @register
 def run_dummy_protocol():
-    protocol_id, run_id = driver.transfer(protocol_path="./OT2Driver/protocols/dummy.py")
+    protocol_id, run_id = driver.transfer(protocol_path="./protocols/dummy.py")
     driver.current_run_id = run_id
     progress(0, f"Protocol-ID: {protocol_id} started")
     driver.execute(run_id)
@@ -385,5 +381,21 @@ def get_run_status() -> RunStatus:
 # ------------------------------------------------------------------------- #
 # Arkitekt provisioning
 # ------------------------------------------------------------------------- #
-with easy("OT2", url="go.arkitekt.live") as e:
-    e.run()
+if __name__ == "__main__":
+    load_dotenv()
+    driver = OT2_Driver(
+        config=OT2_Config(
+            ip=os.getenv("OT2_IP", "192.168.5.156"),
+            port=os.getenv("OT2_PORT", 31950),
+        )
+    )
+    app_name = os.getenv("ARKITEKT_APPNAME", "OT2")
+    if app_name == "":
+        print(
+            "ARKITEKT_APPNAME is not set. Please set the ARKITEKT_APPNAME environment variable. For example put it in .env file."
+        )
+        exit(1)
+    app_url = os.getenv("ARKITEKT_URL", "go.arkitekt.live")
+    app = easy(identifier=app_name, url=app_url, redeem_token=os.getenv("REDEEM_TOKEN"))
+    app.enter()
+    app.run()
