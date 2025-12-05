@@ -5,7 +5,9 @@ from opentrons import protocol_api
 
 metadata = {
             'protocolName': 'One cycle - full protocol',
-            'description': 'OT-2 protocol for immunohistochemistry staining using one 6-well slide chamber',
+            'description': 'OT-2 protocol for immunohistochemistry staining using an 8-well slide chamber. '
+                           'This protocol does not include an antigen retrieval step, but it performs'
+                           'deparaffinization of the slides.',
             'author': 'Franziska Niemeyer'}
 requirements = {"robotType": "OT-2", 'apiLevel': '2.18'}
 
@@ -23,13 +25,20 @@ number_antibodies = 1
 num_neg_controls = 1    # slides without primary antibody, only NGS
 
 # Define initial volumes for each liquid
-h2o2_init = (num_slides * 100) + 100
-ngs_init = (num_slides * 100) + 100
+milliq_init = (num_slides * 2 * parameters['wash_volume']) + parameters['wash_volume']
+xylene_init = (num_slides * 3 * parameters['wash_volume']) + parameters['wash_volume']
+eth100_init = (num_slides * 3 * parameters['wash_volume']) + parameters['wash_volume']
+eth96_init = (num_slides * 2 * parameters['wash_volume']) + parameters['wash_volume']
+eth70_init = (num_slides * 1 * parameters['wash_volume']) + parameters['wash_volume']
+h2o2_init = (num_slides * 1 * parameters['wash_volume']) + parameters['wash_volume']
+ngs_init = (num_slides * 1 * parameters['wash_volume']) + parameters['wash_volume'] if num_neg_controls == 0\
+    else (num_slides * parameters['wash_volume']) + (num_neg_controls * parameters['wash_volume']) + parameters['wash_volume']
+antibody1_init = (num_slides * parameters['wash_volume']) + parameters['wash_volume'] if num_neg_controls == 0\
+    else (num_slides * parameters['wash_volume']) + parameters['wash_volume'] - (parameters['wash_volume'] * num_neg_controls)
+secondary_init = (num_slides * parameters['wash_volume']) + parameters['wash_volume']
+tbst_init = (num_slides * 16 * parameters['wash_volume']) + parameters['wash_volume']    # assuming a 50ml tube
 # trypsin_1_1_init = 300  # for dilution 1:1
 # trypsin_1_3_init = 300  # for dilution 1:3
-antibody1_init = (num_slides * 100) + 100 if num_neg_controls == 0 else (num_slides * 100) + 100 - (100 * num_neg_controls)
-secondary_init = (num_slides * 100) + 100
-tbst_init = (num_slides * 1600) + 100    # assuming a 50ml tube
 
 def add_reagent(pipette, source_well, target_wells, n_repetitions, volume, incubation_minutes, protocol, incubation_seconds=0):
     """
@@ -88,6 +97,21 @@ def run(protocol: protocol_api.ProtocolContext):
     pipette = protocol.load_instrument('p1000_single_gen2', 'right', tip_racks=[tips])
 
     # define liquids used
+    milliq_liquid = protocol.define_liquid(name='MilliQ Water',
+                                           description='MilliQ water',
+                                           display_color='#00000F')
+    xylene_liquid = protocol.define_liquid(name='Xylene',
+                                           description='Xylene for deparaffinization',
+                                           display_color='#0300FF')
+    eth100_liquid = protocol.define_liquid(name='100% Ethanol',
+                                           description='Ethanol 100%',
+                                           display_color='#0303FF')
+    eth96_liquid = protocol.define_liquid(name='96% Ethanol',
+                                          description='Ethanol 96%',
+                                          display_color='#0304FF')
+    eth70_liquid = protocol.define_liquid(name='70% Ethanol',
+                                          description='Ethanol 70%',
+                                          display_color='#0305FF')
     h2o2_liquid = protocol.define_liquid(name='H2O2',
                                          description='Hydrogen peroxide for blocking',
                                          display_color='#0000FF')
@@ -115,14 +139,19 @@ def run(protocol: protocol_api.ProtocolContext):
 
     antibody1 = [eppie['A1'], antibody1_init]
     # antibody2 = [eppie['A2'], antibody2_init]
-
     secondary = [falcon['A1'], secondary_init]
+    milliq = [eppie['A2'], milliq_init]
+    xylene = [eppie['A3'], xylene_init]
+    eth100 = [eppie['A4'], eth100_init]
+    eth96 = [eppie['A5'], eth96_init]
+    eth70 = [eppie['A6'], eth70_init]
     h2o2 = [falcon['A2'], h2o2_init]
     ngs = [falcon['B1'], ngs_init]
 
     tbst = [falcon['A3'], tbst_init]
 
     # load liquids
+    xylene[0].load_liquid(liquid=h2o2_liquid, volume=h2o2[1])
     h2o2[0].load_liquid(liquid=h2o2_liquid, volume=h2o2[1])
     ngs[0].load_liquid(liquid=ngs_liquid, volume=ngs[1])
     antibody1[0].load_liquid(liquid=antibody1_liquid, volume=antibody1[1])
@@ -145,6 +174,46 @@ def run(protocol: protocol_api.ProtocolContext):
     # nkx_ab_slides_box_3 = slide_rack3.wells('A1', 'B1', 'A2', 'B2')
 
     # ====== proceed to protocol =======
+
+    # Deparaffinization
+    xylene = add_reagent(pipette,
+                       source_well=xylene,
+                       target_wells=[dest_wells_box1, dest_wells_box2, dest_wells_box3],
+                       n_repetitions=3,
+                       volume=parameters['wash_volume'],
+                       incubation_minutes=5,
+                       protocol=protocol)
+    eth100 = add_reagent(pipette,
+                       source_well=eth100,
+                       target_wells=[dest_wells_box1, dest_wells_box2, dest_wells_box3],
+                       n_repetitions=3,
+                       volume=parameters['wash_volume'],
+                       incubation_minutes=1,
+                       protocol=protocol)
+    eth96 = add_reagent(pipette,
+                       source_well=eth96,
+                       target_wells=[dest_wells_box1, dest_wells_box2, dest_wells_box3],
+                       n_repetitions=2,
+                       volume=parameters['wash_volume'],
+                       incubation_minutes=1,
+                       protocol=protocol)
+    eth70 = add_reagent(pipette,
+                       source_well=eth70,
+                       target_wells=[dest_wells_box1, dest_wells_box2, dest_wells_box3],
+                       n_repetitions=1,
+                       volume=parameters['wash_volume'],
+                       incubation_minutes=1,
+                       protocol=protocol)
+    milliq = add_reagent(pipette,
+                       source_well=milliq,
+                       target_wells=[dest_wells_box1, dest_wells_box2, dest_wells_box3],
+                       n_repetitions=2,
+                       volume=parameters['wash_volume'],
+                       incubation_minutes=1,
+                       protocol=protocol)
+
+
+    # Antigen retrieval?
 
     # wash step with TBST
     tbst = add_reagent(pipette,
@@ -231,12 +300,37 @@ def run(protocol: protocol_api.ProtocolContext):
                        incubation_seconds=15,
                        protocol=protocol)
 
-    print('Volumes left in tubes:')
-    print(f'Antibody 1: {antibody1[1]}')
+    print('Volumes left in tubes:\n')
+    print(f'Antibody 1\n'
+          f'Initially: {antibody1_init}\n'
+          f'Remaining: {antibody1[1]}\n')
     # print(f'Antibody 2: {antibody2[1]}')
-    print(f'Secondary: {secondary[1]}')
-    print(f'H2O2: {h2o2[1]}')
-    print(f'TBST: {tbst[1]}')
+    print(f'Secondary\n'
+          f'Initially: {secondary_init}\n'
+          f'Remaining: {secondary[1]}\n')
+    print(f'MilliQ\n'
+          f'Initially: {milliq_init}\n'
+          f'Remaining: {milliq[1]}\n')
+    print(f'Xylene\n'
+          f'Initially: {xylene_init}\n'
+          f'Remaining: {xylene[1]}\n')
+    print(f'Eth100\n'
+          f'Initially: {eth100_init}\n'
+          f'Remaining: {eth100[1]}\n')
+    print(f'Eth96\n'
+          f'Initially: {eth96_init}\n'
+          f'Remaining: {eth96[1]}\n')
+    print(f'Eth70\n'
+          f'Initially: {eth70_init}\n'
+          f'Remaining: {eth70[1]}\n')
+    print(f'H2O2\n'
+          f'Initially: {h2o2_init}\n'
+          f'Remaining: {h2o2[1]}\n')
+    print(f'TBST\n'
+          f'Initially: {tbst_init}\n'
+          f'Remaining: {tbst[1]}\n')
     # print(f'Trypsin 1:1: {trypsin_1_1[1]}')
     # print(f'Trypsin 1:3: {trypsin_1_3[1]}')
-    print(f'NGS: {ngs[1]}')
+    print(f'NGS\n'
+          f'Initially: {ngs_init}\n'
+          f'Remaining: {ngs[1]}\n')
