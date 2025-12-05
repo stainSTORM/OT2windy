@@ -348,7 +348,8 @@ async def await_staining_result() -> Optional[Dict]:
 # ------------------------------------------------------------------------- #
 @register
 def run_washing_protocol():
-    protocol_id, run_id = driver.transfer(protocol_path="./protocols/washing.py")
+    protocol_path = Path(__file__).parent / "protocols" / "washing.py"
+    protocol_id, run_id = driver.transfer(protocol_path=str(protocol_path))
     driver.current_run_id = run_id
     progress(0, f"Protocol-ID: {protocol_id}")
     driver.execute(run_id)
@@ -357,7 +358,8 @@ def run_washing_protocol():
 
 @register
 def run_staining_protocol():
-    protocol_id, run_id = driver.transfer(protocol_path="./protocols/staining.py")
+    protocol_path = Path(__file__).parent / "protocols" / "staining.py"
+    protocol_id, run_id = driver.transfer(protocol_path=str(protocol_path))
     driver.current_run_id = run_id
     progress(0, f"Protocol-ID: {protocol_id} started")
     driver.execute(run_id)
@@ -366,7 +368,8 @@ def run_staining_protocol():
 
 @register
 def run_dummy_protocol():
-    protocol_id, run_id = driver.transfer(protocol_path="./protocols/dummy.py")
+    protocol_path = Path(__file__).parent / "protocols" / "dummy.py"
+    protocol_id, run_id = driver.transfer(protocol_path=str(protocol_path))
     driver.current_run_id = run_id
     progress(0, f"Protocol-ID: {protocol_id} started")
     driver.execute(run_id)
