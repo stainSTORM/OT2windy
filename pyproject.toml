@@ -5,7 +5,7 @@ description = "Driver for the Opentrons OT-2 to connect as an agent to arktitekt
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "arkitekt-next>=0.42.0",
+    "arkitekt-next>=0.42",
     "fastapi>=0.123.9",
     "requests>=2.32.5",
     "uvicorn>=0.38.0",
