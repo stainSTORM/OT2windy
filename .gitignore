@@ -5,3 +5,4 @@
 */.venv
 *.arkitekt_next/*
 *ot2windy.egg-info
+*__pycache__*
