@@ -401,6 +401,6 @@ if __name__ == "__main__":
         )
         exit(1)
     app_url = os.getenv("ARKITEKT_URL", "go.arkitekt.live")
-    app = easy(identifier=app_name, url=app_url, redeem_token=os.getenv("REDEEM_TOKEN"))
+    app = easy(identifier=app_name, url=app_url)#, redeem_token=os.getenv("REDEEM_TOKEN"))
     app.enter()
     app.run()
