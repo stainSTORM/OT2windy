@@ -3,4 +3,5 @@
 */.env
 *venv
 */.venv
-*.arkitekt-next
+*.arkitekt_next/*
+*ot2windy.egg-info
