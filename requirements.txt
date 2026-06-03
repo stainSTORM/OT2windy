@@ -1,4 +1,2 @@
-arkitekt-next[all]>=0.29
+arkitekt-next>=0.42
 requests
-
-
