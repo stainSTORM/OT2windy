@@ -385,13 +385,15 @@ def get_run_status() -> RunStatus:
 # Arkitekt provisioning
 # ------------------------------------------------------------------------- #
 if __name__ == "__main__":
+    print("Starting OT2 Driver...")
     load_dotenv()
     driver = OT2_Driver(
         config=OT2_Config(
-            ip=os.getenv("OT2_IP", "192.168.5.156"),
+            ip=os.getenv("OT2_IP", "169.254.254.239"),
             port=os.getenv("OT2_PORT", 31950),
         )
     )
+    print("OT2 Driver connected to robot at", driver.base_url, "\n")
     app_name = os.getenv("ARKITEKT_APPNAME", "OT2")
     if app_name == "":
         print(
