@@ -176,9 +176,10 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # load labware
     tips = protocol.load_labware('opentrons_96_tiprack_300ul', 8)
-    tips.set_offset(x=0.00, y=0.00, z=24.00)
+    tips.set_offset(x=1, y=-2, z=23)
     slide_rack1 = protocol.load_labware_from_definition(staining_jar, 1, 'staining_jar')
     falcon = protocol.load_labware('opentrons_15_tuberack_falcon_15ml_conical', 3)
+    falcon.set_offset(x=2, y=2, z=0)
 
     # load instruments
     pipette = protocol.load_instrument('p300_single_gen2', 'right', tip_racks=[tips])
