@@ -175,7 +175,7 @@ def add_reagent(pipette, source_well, target_wells, n_repetitions, volume, incub
 def run(protocol: protocol_api.ProtocolContext):
 
     # load labware
-    tips = protocol.load_labware('opentrons_96_tiprack_200ul', 8)
+    tips = protocol.load_labware('opentrons_96_tiprack_300ul', 8)
     slide_rack1 = protocol.load_labware_from_definition(staining_jar, 1, 'staining_jar')
     falcon = protocol.load_labware('opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical', 3)
 
