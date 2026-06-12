@@ -1,0 +1,121 @@
+{
+    "ordering": [
+        [
+            "A1",
+            "B1",
+            "C1"
+        ],
+        [
+            "A2",
+            "B2",
+            "C2"
+        ]
+    ],
+    "brand": {
+        "brand": "The real OT",
+        "brandId": []
+    },
+    "metadata": {
+        "displayName": "The Real Staining Jar",
+        "displayCategory": "wellPlate",
+        "displayVolumeUnits": "µL",
+        "tags": []
+    },
+    "dimensions": {
+        "xDimension": 127.5,
+        "yDimension": 85.2,
+        "zDimension": 130
+    },
+    "wells": {
+        "A1": {
+            "depth": 16.8,
+            "totalLiquidVolume": 200,
+            "shape": "rectangular",
+            "xDimension": 20,
+            "yDimension": 0.1,
+            "x": 40,
+            "y": 42.5,
+            "z": 113.2
+        },
+        "B1": {
+            "depth": 16.8,
+            "totalLiquidVolume": 200,
+            "shape": "rectangular",
+            "xDimension": 20,
+            "yDimension": 0.1,
+            "x": 40,
+            "y": 21.3,
+            "z": 113.2
+        },
+        "C1": {
+            "depth": 16.8,
+            "totalLiquidVolume": 200,
+            "shape": "rectangular",
+            "xDimension": 20,
+            "yDimension": 0.1,
+            "x": 40,
+            "y": 0.1,
+            "z": 113.2
+        },
+        "A2": {
+            "depth": 16.8,
+            "totalLiquidVolume": 200,
+            "shape": "rectangular",
+            "xDimension": 20,
+            "yDimension": 0.1,
+            "x": 90,
+            "y": 42.5,
+            "z": 113.2
+        },
+        "B2": {
+            "depth": 16.8,
+            "totalLiquidVolume": 200,
+            "shape": "rectangular",
+            "xDimension": 20,
+            "yDimension": 0.1,
+            "x": 90,
+            "y": 21.3,
+            "z": 113.2
+        },
+        "C2": {
+            "depth": 16.8,
+            "totalLiquidVolume": 200,
+            "shape": "rectangular",
+            "xDimension": 20,
+            "yDimension": 0.1,
+            "x": 90,
+            "y": 0.1,
+            "z": 113.2
+        }
+    },
+    "groups": [
+        {
+            "metadata": {
+                "wellBottomShape": "v"
+            },
+            "wells": [
+                "A1",
+                "B1",
+                "C1",
+                "A2",
+                "B2",
+                "C2"
+            ]
+        }
+    ],
+    "parameters": {
+        "format": "irregular",
+        "quirks": [],
+        "isTiprack": False,
+        "isMagneticModuleCompatible": False,
+        "loadName": "staining_jar"
+    },
+    "namespace": "custom_beta",
+    "version": 1,
+    "schemaVersion": 2,
+    "cornerOffsetFromSlot": {
+        "x": -3.0,
+        "y": -3.0,
+        "z": 2.0
+    }
+}

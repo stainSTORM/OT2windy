@@ -40,129 +40,75 @@ staining_jar = {
         [
             "A2",
             "B2"
-        ],
-        [
-            "A3",
-            "B3"
-        ],
-        [
-            "A4",
-            "B4"
         ]
     ],
     "brand": {
-        "brand": "Custom",
-        "brandId": [
-            "Custom"
-        ]
+        "brand": "The real OT",
+        "brandId": []
     },
     "metadata": {
-        "displayName": "StainChamberTest",
+        "displayName": "The Real Staining Jar",
         "displayCategory": "wellPlate",
         "displayVolumeUnits": "µL",
         "tags": []
     },
     "dimensions": {
-        "xDimension": 127.76,
-        "yDimension": 85.47,
-        "zDimension": 110
+        "xDimension": 127.5,
+        "yDimension": 85.2,
+        "zDimension": 130
     },
     "wells": {
         "A1": {
-            "depth": 10,
-            "totalLiquidVolume": 10000,
+            "depth": 16.8,
+            "totalLiquidVolume": 200,
             "shape": "rectangular",
-            "xDimension": 10,
-            "yDimension": 20,
-            "x": 15,
-            "y": 64.47,
-            "z": 100
+            "xDimension": 20,
+            "yDimension": 0.1,
+            "x": 40,
+            "y": 42.5,
+            "z": 113.2
         },
         "B1": {
-            "depth": 10,
-            "totalLiquidVolume": 10000,
+            "depth": 16.8,
+            "totalLiquidVolume": 200,
             "shape": "rectangular",
-            "xDimension": 10,
-            "yDimension": 20,
-            "x": 15,
-            "y": 19.47,
-            "z": 100
+            "xDimension": 20,
+            "yDimension": 0.1,
+            "x": 40,
+            "y": 0.1,
+            "z": 113.2
         },
         "A2": {
-            "depth": 10,
-            "totalLiquidVolume": 10000,
+            "depth": 16.8,
+            "totalLiquidVolume": 200,
             "shape": "rectangular",
-            "xDimension": 10,
-            "yDimension": 20,
-            "x": 40,
-            "y": 64.47,
-            "z": 100
+            "xDimension": 20,
+            "yDimension": 0.1,
+            "x": 90,
+            "y": 42.5,
+            "z": 113.2
         },
         "B2": {
-            "depth": 10,
-            "totalLiquidVolume": 10000,
+            "depth": 16.8,
+            "totalLiquidVolume": 200,
             "shape": "rectangular",
-            "xDimension": 10,
-            "yDimension": 20,
-            "x": 40,
-            "y": 19.47,
-            "z": 100
-        },
-        "A3": {
-            "depth": 10,
-            "totalLiquidVolume": 10000,
-            "shape": "rectangular",
-            "xDimension": 10,
-            "yDimension": 20,
-            "x": 65,
-            "y": 64.47,
-            "z": 100
-        },
-        "B3": {
-            "depth": 10,
-            "totalLiquidVolume": 10000,
-            "shape": "rectangular",
-            "xDimension": 10,
-            "yDimension": 20,
-            "x": 65,
-            "y": 19.47,
-            "z": 100
-        },
-        "A4": {
-            "depth": 10,
-            "totalLiquidVolume": 10000,
-            "shape": "rectangular",
-            "xDimension": 10,
-            "yDimension": 20,
+            "xDimension": 20,
+            "yDimension": 0.1,
             "x": 90,
-            "y": 64.47,
-            "z": 100
-        },
-        "B4": {
-            "depth": 10,
-            "totalLiquidVolume": 10000,
-            "shape": "rectangular",
-            "xDimension": 10,
-            "yDimension": 20,
-            "x": 90,
-            "y": 19.47,
-            "z": 100
+            "y": 0.1,
+            "z": 113.2
         }
     },
     "groups": [
         {
             "metadata": {
-                "wellBottomShape": "flat"
+                "wellBottomShape": "v"
             },
             "wells": [
                 "A1",
                 "B1",
                 "A2",
                 "B2",
-                "A3",
-                "B3",
-                "A4",
-                "B4"
             ]
         }
     ],
@@ -171,15 +117,15 @@ staining_jar = {
         "quirks": [],
         "isTiprack": False,
         "isMagneticModuleCompatible": False,
-        "loadName": "stainchambertest_8well"
+        "loadName": "staining_jar"
     },
     "namespace": "custom_beta",
     "version": 1,
     "schemaVersion": 2,
     "cornerOffsetFromSlot": {
-        "x": 0,
-        "y": 0,
-        "z": 0
+        "x": -3.0,
+        "y": -3.0,
+        "z": 2.0
     }
 }
 
@@ -229,9 +175,8 @@ def add_reagent(pipette, source_well, target_wells, n_repetitions, volume, incub
 def run(protocol: protocol_api.ProtocolContext):
 
     # load labware
-    tips = protocol.load_labware('opentrons_96_tiprack_1000ul', 8)
-    slide_rack1 = protocol.load_labware_from_definition(staining_jar, 1, '8 well stain chamber')
-    eppie = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 2)
+    tips = protocol.load_labware('opentrons_96_tiprack_200ul', 8)
+    slide_rack1 = protocol.load_labware_from_definition(staining_jar, 1, 'staining_jar')
     falcon = protocol.load_labware('opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical', 3)
 
     # load instruments
