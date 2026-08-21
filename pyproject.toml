@@ -3,11 +3,11 @@ name = "ot2windy"
 version = "0.1.0"
 description = "Driver for the Opentrons OT-2 to connect as an agent to arktitekt-next"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.11,<3.13"
 dependencies = [
     "arkitekt-next>=0.42",
     "fastapi>=0.123.9",
-    "opentrons>=9.1.1",
+    "opentrons>=9.0.0,<9.1",
     "requests>=2.32.5",
     "uvicorn>=0.38.0",
 ]

@@ -358,7 +358,7 @@ def run_washing_protocol():
 
 @register
 def run_staining_protocol():
-    protocol_path = Path(__file__).parent / "protocols" / "staining.py"
+    protocol_path = Path(__file__).parent / "protocols" / "ccIHC_cycle1_Pan-CK_testing.py"
     protocol_id, run_id = driver.transfer(protocol_path=str(protocol_path))
     driver.current_run_id = run_id
     progress(0, f"Protocol-ID: {protocol_id} started")
@@ -394,13 +394,16 @@ if __name__ == "__main__":
         )
     )
     print("OT2 Driver connected to robot at", driver.base_url, "\n")
-    app_name = os.getenv("ARKITEKT_APPNAME", "OT2")
-    if app_name == "":
-        print(
-            "ARKITEKT_APPNAME is not set. Please set the ARKITEKT_APPNAME environment variable. For example put it in .env file."
-        )
-        exit(1)
-    app_url = os.getenv("ARKITEKT_URL", "go.arkitekt.live")
-    app = easy(identifier=app_name, url=app_url)#, redeem_token=os.getenv("REDEEM_TOKEN"))
-    app.enter()
-    app.run()
+    
+    run_staining_protocol()
+    
+    # app_name = os.getenv("ARKITEKT_APPNAME", "OT2")
+    # if app_name == "":
+    #     print(
+    #         "ARKITEKT_APPNAME is not set. Please set the ARKITEKT_APPNAME environment variable. For example put it in .env file."
+    #     )
+    #     exit(1)
+    # app_url = os.getenv("ARKITEKT_URL", "go.arkitekt.live")
+    # app = easy(identifier=app_name, url=app_url)#, redeem_token=os.getenv("REDEEM_TOKEN"))
+    # app.enter()
+    # app.run()
