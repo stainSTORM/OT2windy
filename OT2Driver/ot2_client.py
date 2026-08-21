@@ -270,7 +270,7 @@ mRobot.toggle_light(state=False)
 mRobot.pipette_home("right")
 
 # upload and start a protocol
-protocol_id, run_id = mRobot.transfer(protocol_path="/uc2-workflow/Arkitektrons/OT2Driver/protocols/helloWorldStainstorm.py")
+protocol_id, run_id = mRobot.transfer(protocol_path="protocols/ccIHC_cycle1_Pan-CK_testing.py")
 protocol_id_ = mRobot.execute(run_id=run_id)
 status = mRobot.get_run_status(run_id)
 mRobot.stop_run(run_id)
