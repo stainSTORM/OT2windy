@@ -1,0 +1,19 @@
+# Opentrons OT-2: Arkitekt app settings. On the Pi this file is
+# /home/pi/arkitekt/opentrons/config.yaml and the binding page (http://<pi>/opentrons/) edits it.
+# Saving there restarts the app.
+
+app: ot2windy             # Arkitekt app identifier; protocolapp declares this name
+
+ot2:
+  ip: 169.254.254.239     # the OT-2's address (USB/direct cable: link-local 169.254.x.x)
+  port: 31950
+
+# What run_protocol offers: name -> file. A file is looked up in protocols/ next to this file
+# first, then among the protocols shipped with the app (OT2Driver/protocols).
+protocols:
+  staining: ccIHC_cycle1_Pan-CK_testing.py
+  staining_full: ccIHC_cycle1_Pan-CK.py
+  dummy: dummy.py
+  # washing: washing.py   # not written yet
+
+poll_interval: 1          # seconds between run status checks
