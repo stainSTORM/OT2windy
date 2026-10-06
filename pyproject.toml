@@ -1,17 +1,24 @@
 [project]
 name = "ot2windy"
-version = "0.1.0"
-description = "Driver for the Opentrons OT-2 to connect as an agent to arktitekt-next"
+version = "1.0.0"
+description = "Opentrons OT-2 as an Arkitekt app: uploads and runs protocols over the robot's HTTP API."
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
 dependencies = [
-    "arkitekt-next>=0.42",
-    "fastapi>=0.123.9",
-    "opentrons>=9.0.0,<9.1",
+    "arkitekt[rekuest]>=5.0.1,<6",
+    "fakts>=5.4",  # arkitekt_bind.py: the device-code hook takes one DeviceCodeChallenge
+    "pyyaml>=6",
     "requests>=2.32.5",
-    "uvicorn>=0.38.0",
 ]
 
-[build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
+[dependency-groups]
+dev = [
+    # scripts/ot2_mock_rest.py, a stand-in for the robot's HTTP API
+    "fastapi>=0.123.9",
+    "uvicorn>=0.38.0",
+    # opentrons_simulate, to try a protocol before uploading it
+    "opentrons>=9.0.0,<9.1",
+]
+
+[tool.uv]
+package = false

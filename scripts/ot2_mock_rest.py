@@ -1,15 +1,19 @@
 # fastapi_opentrons_sim.py
 #
 # Run:
-#   uvicorn fastapi_opentrons_sim:app --host 0.0.0.0 --port 8000 --reload
+#   uv run scripts/ot2_mock_rest.py      (port 31950, like the robot; RUN_SECONDS=5)
 #
 # This simulates a minimal subset of the Opentrons HTTP API v2.
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional, Dict, List
+import os
+import time
 import uuid
 import uvicorn
+
+RUN_SECONDS = float(os.getenv("RUN_SECONDS", "5"))
 
 app = FastAPI(title="Opentrons-Sim")
 
@@ -54,6 +58,16 @@ class CommandPayload(BaseModel):
     commandType: str
     params: dict
     intent: Optional[str] = "setup"
+
+# The robot's API wraps request bodies in {"data": ...}, as OT2Driver sends them.
+class CreateRunBody(BaseModel):
+    data: CreateRunPayload = CreateRunPayload()
+
+class RunActionsBody(BaseModel):
+    data: RunActionsPayload
+
+class CommandBody(BaseModel):
+    data: CommandPayload
 
 @app.get("/health")
 def get_health():
@@ -108,7 +122,8 @@ def delete_protocol(protocol_id: str):
     return {"data": {"id": protocol_id, "message": "Protocol deleted"}}
 
 @app.post("/runs")
-def create_run(payload: CreateRunPayload):
+def create_run(body: CreateRunBody):
+    payload = body.data
     run_id = f"run_{uuid.uuid4().hex[:6]}"
     runs_db[run_id] = {
         "id": run_id,
@@ -128,7 +143,13 @@ def list_runs():
 def get_run(run_id: str):
     if run_id not in runs_db:
         raise HTTPException(status_code=404, detail="Run not found")
-    return {"data": runs_db[run_id]}
+    run = runs_db[run_id]
+    # a run finishes RUN_SECONDS after play; a stop request is honoured at once
+    if run["status"] == "running" and time.time() - run["started"] > RUN_SECONDS:
+        run["status"] = "succeeded"
+    elif run["status"] == "stop-requested":
+        run["status"] = "stopped"
+    return {"data": run}
 
 @app.delete("/runs/{run_id}")
 def delete_run(run_id: str):
@@ -139,7 +160,8 @@ def delete_run(run_id: str):
     return {"data": {"id": run_id, "message": "Run deleted"}}
 
 @app.post("/runs/{run_id}/actions")
-def post_run_actions(run_id: str, payload: RunActionsPayload):
+def post_run_actions(run_id: str, body: RunActionsBody):
+    payload = body.data
     if run_id not in runs_db:
         raise HTTPException(status_code=404, detail="Run not found")
 
@@ -147,6 +169,7 @@ def post_run_actions(run_id: str, payload: RunActionsPayload):
     if action_type == "play":
         if runs_db[run_id]["status"] in ["idle", "paused"]:
             runs_db[run_id]["status"] = "running"
+            runs_db[run_id].setdefault("started", time.time())
         # simulate finishing
         else:
             pass
@@ -161,7 +184,8 @@ def post_run_actions(run_id: str, payload: RunActionsPayload):
     return {"data": {"id": action_id, "actionType": action_type}}
 
 @app.post("/runs/{run_id}/commands")
-def post_run_commands(run_id: str, payload: CommandPayload):
+def post_run_commands(run_id: str, body: CommandBody):
+    payload = body.data
     if run_id not in runs_db:
         raise HTTPException(status_code=404, detail="Run not found")
 

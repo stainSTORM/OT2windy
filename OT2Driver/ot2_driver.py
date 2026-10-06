@@ -1,24 +1,11 @@
-# Arkitekt + Mikro imports
-from arkitekt_next import register, easy, progress
-from koil.vars import check_cancelled
+"""HTTP driver for the Opentrons OT-2 (robot server API, port 31950). The Arkitekt app is app.py."""
 
-# OT2 Driver imports
 import time
-import asyncio
 import requests
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from urllib3 import Retry
-from dotenv import load_dotenv
-import os
-
-# Example fallback definitions if not externally available
-class PathLike:
-    pass
-
-
-task: Optional[asyncio.Task] = None
 
 
 class OT2_Config:
@@ -135,6 +122,7 @@ class OT2_Driver:
         session.mount("http://", requests.adapters.HTTPAdapter(**adapter_kwargs))
         session.mount("https://", requests.adapters.HTTPAdapter(**adapter_kwargs))
 
+        kwargs.setdefault("timeout", 10)  # without one a half-open connection hangs forever
         try:
             response = session.request(method=method, url=url, **kwargs)
             response.raise_for_status()
@@ -244,9 +232,9 @@ class OT2_Driver:
         return runs_simplified
 
     def get_robot_status(self) -> RobotStatus:
-        runs = self.get_runs()
+        runs = self.get_runs()  # raises if the robot does not answer
         if not runs:
-            return RobotStatus.OFFLINE
+            return RobotStatus.IDLE
         for run in runs:
             if run["status"] in [elem.value for elem in RunStatus]:
                 if run["status"] not in ["succeeded", "stop-requested", "stopped"]:
@@ -311,99 +299,3 @@ class OT2_Driver:
                 json={"data": {"actionType": "play"}},
             )
         return run_id
-
-
-# ------------------------------------------------------------------------- #
-# Helper functions
-# ------------------------------------------------------------------------- #
-
-
-def watch_run_completion(run_id: str) -> Dict:
-    while True:
-        status = driver.check_run_status(run_id)
-        if status in [RunStatus.SUCCEEDED, RunStatus.FAILED, RunStatus.STOPPED]:
-            break
-        try:
-            check_cancelled()
-        except Exception:
-            driver.cancel(run_id)
-            while True:
-                status = driver.check_run_status(run_id)
-                if status in [RunStatus.FAILED, RunStatus.STOPPED]:
-                    break
-                time.sleep(1)
-        time.sleep(1)
-    return driver.get_run_log(run_id)
-
-
-async def await_staining_result() -> Optional[Dict]:
-    global task
-    if task is None:
-        return None
-    return await task
-
-
-# ------------------------------------------------------------------------- #
-# Arkitekt registered functions
-# ------------------------------------------------------------------------- #
-@register
-def run_washing_protocol():
-    protocol_path = Path(__file__).parent / "protocols" / "washing.py"
-    protocol_id, run_id = driver.transfer(protocol_path=str(protocol_path))
-    driver.current_run_id = run_id
-    progress(0, f"Protocol-ID: {protocol_id}")
-    driver.execute(run_id)
-    watch_run_completion(run_id)
-
-
-@register
-def run_staining_protocol():
-    protocol_path = Path(__file__).parent / "protocols" / "ccIHC_cycle1_Pan-CK_testing.py"
-    protocol_id, run_id = driver.transfer(protocol_path=str(protocol_path))
-    driver.current_run_id = run_id
-    progress(0, f"Protocol-ID: {protocol_id} started")
-    driver.execute(run_id)
-    watch_run_completion(run_id)
-
-
-@register
-def run_dummy_protocol():
-    protocol_path = Path(__file__).parent / "protocols" / "dummy.py"
-    protocol_id, run_id = driver.transfer(protocol_path=str(protocol_path))
-    driver.current_run_id = run_id
-    progress(0, f"Protocol-ID: {protocol_id} started")
-    driver.execute(run_id)
-    watch_run_completion(run_id)
-
-
-@register
-def get_run_status() -> RunStatus:
-    return driver.check_run_status(run_id=driver.current_run_id)
-
-
-# ------------------------------------------------------------------------- #
-# Arkitekt provisioning
-# ------------------------------------------------------------------------- #
-if __name__ == "__main__":
-    print("Starting OT2 Driver...")
-    load_dotenv()
-    driver = OT2_Driver(
-        config=OT2_Config(
-            ip=os.getenv("OT2_IP", "169.254.254.239"),
-            port=os.getenv("OT2_PORT", 31950),
-        )
-    )
-    print("OT2 Driver connected to robot at", driver.base_url, "\n")
-    
-    run_staining_protocol()
-    
-    # app_name = os.getenv("ARKITEKT_APPNAME", "OT2")
-    # if app_name == "":
-    #     print(
-    #         "ARKITEKT_APPNAME is not set. Please set the ARKITEKT_APPNAME environment variable. For example put it in .env file."
-    #     )
-    #     exit(1)
-    # app_url = os.getenv("ARKITEKT_URL", "go.arkitekt.live")
-    # app = easy(identifier=app_name, url=app_url)#, redeem_token=os.getenv("REDEEM_TOKEN"))
-    # app.enter()
-    # app.run()

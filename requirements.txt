@@ -1,2 +1,0 @@
-arkitekt-next>=0.42
-requests

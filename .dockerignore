@@ -1,0 +1,7 @@
+.git
+.venv
+.state
+config.yaml
+scripts
+**/__pycache__
+**/.DS_Store

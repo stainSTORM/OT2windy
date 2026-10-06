@@ -11,3 +11,5 @@ servers/
 *.pyc
 *ot2windy.egg-info
 *__pycache__*
+config.yaml
+.state/

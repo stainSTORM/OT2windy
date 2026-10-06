@@ -1,33 +1,18 @@
-# Use an official Python runtime as a base image
-# Build: sudo docker build -t arkitekt_opentrons .
-# Clean Cache https://stackoverflow.com/questions/62473932/at-least-one-invalid-signature-was-encountered
-# Run: sudo docker run -it --rm --name arkitekt_opentrons arkitekt_opentrons
-FROM python:3.10-slim
-
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-# Install debian-archive-keyring first, then update and install build-essential
-RUN apt-get update && \
-    apt-get install -y debian-archive-keyring && \
-    apt-get update && \
-    apt-get install -y build-essential && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-# Set the working directory
+# Opentrons OT-2 as an Arkitekt app, for the openUC2 OS (os-rpi) and any Docker host.
+#   docker build -t ot2windy .
+#   docker run -p 8080:8080 -v ~/ot2:/config ot2windy   -> http://localhost:8080/
+FROM python:3.12-slim
+COPY --from=ghcr.io/astral-sh/uv:0.9 /uv /bin/uv
+ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy UV_PYTHON_DOWNLOADS=never \
+    UV_PROJECT_ENVIRONMENT=/opt/venv PATH=/opt/venv/bin:$PATH PYTHONUNBUFFERED=1
 WORKDIR /app
-
-# Copy requirements and install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the application code into the container
-COPY ot2_driver.py .
-
-# Expose any ports the app runs on
-EXPOSE 8000
-# additional port for Arkitekt?
-
-# Run the script
-CMD ["python", "ot2_driver.py"]
-
+COPY pyproject.toml uv.lock .python-version ./
+RUN uv sync --frozen --no-dev
+COPY app.py arkitekt_bind.py config.example.yaml ./
+COPY OT2Driver OT2Driver
+# config.yaml, extra protocols (protocols/) and the stored login (.state/) live in /config.
+ENV OT2_CONFIG=/config/config.yaml
+RUN useradd -u 1000 -m app && mkdir /config && chown app /config
+USER app
+EXPOSE 8080
+CMD ["python", "app.py"]
