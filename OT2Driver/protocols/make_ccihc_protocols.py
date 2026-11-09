@@ -52,13 +52,13 @@ CYCLES = [
         'color':       '#1475BF',
         'slides':      None,      # None = every non-control slide
     },
-    {
-        'name':        'Ki67',
-        'description': 'Ki67 (ab197547-biotin) + StreptaClick HRP, 1:100',
-        'well':        'B3',
-        'color':       "#3C5D6C",
-        'slides':      None,
-    },
+    # {
+    #     'name':        'Ki67',
+    #     'description': 'Ki67 (ab197547-biotin) + StreptaClick HRP, 1:100',
+    #     'well':        'B3',
+    #     'color':       "#3C5D6C",
+    #     'slides':      None,
+    # },
 ]
 
 # Shared settings written into every generated file.
@@ -222,12 +222,12 @@ SLOTS_TIPRACKS = [8, 9]
 HAZ_TIP_LABWARE = 'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical'   # tip-drop rack
 SLOT_HAZ_TIP = 6                                        # deck slot for that rack
 HAZ_TIP_WELL = {
-    'aec':  'A1',      # 50 ml Falcon that collects AEC-contaminated tips
-    'hema': 'A2',      # 50 ml Falcon that collects haematoxylin tips
+    'aec':  'A3',      # 50 ml Falcon that collects AEC-contaminated tips
+    'hema': 'B3',      # 50 ml Falcon that collects haematoxylin tips
 }
 # Drop height above the Falcon mouth (mm). The tube is tall, so eject well above
 # the rim; increase if tips catch on the way in.
-HAZ_TIP_DROP_Z = 55.0
+HAZ_TIP_DROP_Z = 10.0
 
 # ==============================================================================
 # END OF CONFIGURATION
