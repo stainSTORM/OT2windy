@@ -65,8 +65,8 @@ CYCLES = [
 SHARED = {
     'BOX1': 6,
     'BOX2': 0,
-    'NEG_CONTROL_SLIDES': [0],
-    'REAGENT_VOLUME': 150,
+    'NEG_CONTROL_SLIDES': [0,1],
+    'REAGENT_VOLUME': 100,
     'WASH_VOLUME': 150,
     'ANTIBODY_INCUBATION_MIN': 50,
     'HRP_BLOCK_EVERY_CYCLE': True,
@@ -219,7 +219,7 @@ SLOTS_TIPRACKS = [8, 9]
 # empty Falcon sits in. Use a different well (or a different slot) for AEC vs
 # hema so the two tip streams never share a tube. Wire in your real labware load
 # name below if it differs.
-HAZ_TIP_LABWARE = 'opentrons_6_tuberack_falcon_50ml'   # <-- your tip-drop rack
+HAZ_TIP_LABWARE = 'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical'   # tip-drop rack
 SLOT_HAZ_TIP = 6                                        # deck slot for that rack
 HAZ_TIP_WELL = {
     'aec':  'A1',      # 50 ml Falcon that collects AEC-contaminated tips

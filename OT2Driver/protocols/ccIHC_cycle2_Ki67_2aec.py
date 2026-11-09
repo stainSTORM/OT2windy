@@ -57,10 +57,10 @@ requirements = {"robotType": "OT-2", 'apiLevel': '2.18'}
 BOX_SIZES = {'box1': 6, 'box2': 0}
 
 # 0-indexed across box1 then box2. These get 0.5% BSA/PBS instead of antibody.
-NEG_CONTROL_SLIDES = [0]
+NEG_CONTROL_SLIDES = [0, 1]
 
 # --- Volumes ------------------------------------------------------------------
-REAGENT_VOLUME = 150          # ul per section per reagent application
+REAGENT_VOLUME = 100          # ul per section per reagent application
 WASH_VOLUME = 150                # ul per wash exchange
 ANTIBODY_INCUBATION_MIN = 50
 
@@ -131,7 +131,7 @@ SLOTS_TIPRACKS = [8, 9]
 # empty Falcon sits in. Use a different well (or a different slot) for AEC vs
 # hema so the two tip streams never share a tube. Wire in your real labware load
 # name below if it differs.
-HAZ_TIP_LABWARE = 'opentrons_6_tuberack_falcon_50ml'   # <-- your tip-drop rack
+HAZ_TIP_LABWARE = 'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical'   # tip-drop rack
 SLOT_HAZ_TIP = 6                                        # deck slot for that rack
 HAZ_TIP_WELL = {
     'aec':  'A1',      # 50 ml Falcon that collects AEC-contaminated tips
