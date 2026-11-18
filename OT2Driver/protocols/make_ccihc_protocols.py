@@ -63,7 +63,7 @@ CYCLES = [
 
 # Shared settings written into every generated file.
 SHARED = {
-    'BOX1': 6,
+    'BOX1': 4,
     'BOX2': 0,
     'NEG_CONTROL_SLIDES': [0,1],
     'REAGENT_VOLUME': 100,

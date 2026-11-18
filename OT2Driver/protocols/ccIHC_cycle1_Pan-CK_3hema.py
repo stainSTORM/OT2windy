@@ -54,7 +54,7 @@ requirements = {"robotType": "OT-2", 'apiLevel': '2.18'}
 # ==============================================================================
 
 # --- Slides -------------------------------------------------------------------
-BOX_SIZES = {'box1': 6, 'box2': 0}
+BOX_SIZES = {'box1': 4, 'box2': 0}
 
 # 0-indexed across box1 then box2. These get 0.5% BSA/PBS instead of antibody.
 NEG_CONTROL_SLIDES = [0, 1]
