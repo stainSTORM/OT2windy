@@ -260,7 +260,7 @@ def run(protocol: protocol_api.ProtocolContext):
         n_top = (max(0, int(ANTIBODY_INCUBATION_MIN // TOPUP_INTERVAL_MIN) - 1)
                  if TOPUP_LONG_INCUBATIONS else 0)
         ab_volume = (len(ab_wells) * (REAGENT_VOLUME + n_top * TOPUP_VOLUME)
-                     + DEAD_VOLUME['1.5ml'] + 100)
+                     + DEAD_VOLUME['1.5ml'])
         if ab_volume > 1500:
             protocol.comment(f"WARNING: {ANTIBODY['name']} needs {ab_volume} ul, more than a "
                              "1.5 ml tube holds. Use fewer slides or a 15 ml tube.")
