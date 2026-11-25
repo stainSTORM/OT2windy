@@ -374,7 +374,7 @@ def run(protocol: protocol_api.ProtocolContext):
         pipette.distribute(volume, src, targets,
                            new_tip="never", blow_out=True,
                            blowout_location="source well",
-                           disposal_vol=0, air_gap=10)
+                           disposal_volume=0, air_gap=10)
         if not keep_tip:
             _drop()
 
